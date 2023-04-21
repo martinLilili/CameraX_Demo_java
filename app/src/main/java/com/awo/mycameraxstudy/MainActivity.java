@@ -1,10 +1,14 @@
 package com.awo.mycameraxstudy;
 
+import static android.view.Surface.ROTATION_90;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageAnalysisConfig;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureConfig;
 import androidx.camera.core.ImageInfo;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
@@ -29,6 +33,7 @@ import android.util.Size;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -42,6 +47,13 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView ttv;// 用以显示预览画面的的View组件
 
+    Button takeBtn;
+    ImageView ivTake;
+
+    boolean take = false;
+
+    Bitmap takeBitmap = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +61,17 @@ public class MainActivity extends AppCompatActivity {
 
         // 第一步：设置预览组件的OnLayoutChangeListener（当预览组件的尺寸发生改变时的回调）
         ttv = findViewById(R.id.ttv_camera_preview);
+        takeBtn = findViewById(R.id.btn_take);
+        ivTake = findViewById(R.id.iv_take);
+
+
+        takeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                take = true;
+            }
+        });
+
 //        ttv.setRotationY(180);//镜像翻转
 //        ttv.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
 //            @Override
@@ -188,6 +211,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         ttv.setImageBitmap(bitmap);
+                        if (take) {
+                            takeBitmap = bitmap;
+                            ivTake.setImageBitmap(takeBitmap);
+                            take = false;
+                        }
                     }
                 });
 //                ByteBuffer buffer = img.getPlanes()[0].getBuffer();
