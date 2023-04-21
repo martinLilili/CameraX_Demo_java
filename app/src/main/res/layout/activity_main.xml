@@ -14,13 +14,23 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <com.awo.mycameraxstudy.BoxView
+        android:id="@+id/box"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="@id/ttv_camera_preview"
+        app:layout_constraintRight_toRightOf="@id/ttv_camera_preview"
+        app:layout_constraintTop_toTopOf="@id/ttv_camera_preview"
+        app:layout_constraintBottom_toBottomOf="@id/ttv_camera_preview"
+        />
+
     <Button
         android:id="@+id/btn_take"
         android:layout_width="200px"
         android:layout_height="100px"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:text="拍照"
         />
 
@@ -31,5 +41,15 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_result"
+        android:layout_width="300px"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/black"
+        android:textSize="40px"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

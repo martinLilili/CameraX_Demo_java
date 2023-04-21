@@ -35,10 +35,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.awo.mycameraxstudy.mtcnn.Box;
+import com.awo.mycameraxstudy.mtcnn.MTCNN;
+import com.awo.mycameraxstudy.mtcnn.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +60,12 @@ public class MainActivity extends AppCompatActivity {
 
     Bitmap takeBitmap = null;
 
+    public MTCNN mtcnn;
+
+    TextView tvResult;
+
+    BoxView boxView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,8 +75,10 @@ public class MainActivity extends AppCompatActivity {
         ttv = findViewById(R.id.ttv_camera_preview);
         takeBtn = findViewById(R.id.btn_take);
         ivTake = findViewById(R.id.iv_take);
+        tvResult = findViewById(R.id.tv_result);
+        boxView = findViewById(R.id.box);
 
-
+        mtcnn = new MTCNN(getAssets());
         takeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -207,24 +221,44 @@ public class MainActivity extends AppCompatActivity {
             if (img != null) {
                 Log.d("MainActivity", "Image Time Stamp is: " + img.getTimestamp());
                 Bitmap bitmap = toBitmap(img);
+                Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        for (int i=0;i<boxes.size();i++) {
+                            boxView.setDrawRect(scaleRect(boxes.get(i).transform2Rect(), bitmap));
+                        }
+
                         ttv.setImageBitmap(bitmap);
                         if (take) {
                             takeBitmap = bitmap;
                             ivTake.setImageBitmap(takeBitmap);
                             take = false;
                         }
+                        tvResult.setText("人脸：" + boxes.size());
                     }
                 });
-//                ByteBuffer buffer = img.getPlanes()[0].getBuffer();
-//                byte[] bytes = new byte[buffer.capacity()];
-//                buffer.get(bytes);
-//                Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
 
             }
         }
+    }
+
+    private Rect scaleRect (Rect rect, Bitmap bitmap) {
+        Log.d("MAIN", "image size " + bitmap.getWidth() + " " + bitmap.getHeight());
+        Log.d("MAIN", "boxview size " + boxView.getWidth() + " " + boxView.getHeight());
+        float scale = (float)boxView.getHeight() /  (float)bitmap.getHeight();
+        float showWidth = bitmap.getWidth() * scale;
+        float startx = (boxView.getWidth() - showWidth)/2;
+
+        Rect newRect = new Rect();
+        newRect.top = (int) (scale * rect.top);
+        newRect.left = (int) (startx + (int) (scale * rect.left));
+        newRect.bottom = (int) (scale * rect.bottom);
+        newRect.right = (int) ((int) (scale * rect.right) + startx);
+        return newRect;
+
     }
 
     private Bitmap toBitmap(Image image) {
