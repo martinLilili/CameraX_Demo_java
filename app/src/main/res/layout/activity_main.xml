@@ -29,18 +29,78 @@
         android:layout_width="200px"
         android:layout_height="100px"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:text="拍照"
+        />
+
+    <TextView
+        android:id="@+id/tv_blacface"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/btn_take"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/black"
+        android:text="BlazeFace"
+        android:textSize="40px"
+        android:background="#0000ff"
+        />
+
+    <TextView
+        android:id="@+id/tv_MTCNN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/btn_take"
+        app:layout_constraintLeft_toRightOf="@id/tv_blacface"
+        android:textColor="@color/black"
+        android:text="MTCNN"
+        android:textSize="40px"
+        android:layout_marginLeft="10px"
+        />
+
+    <TextView
+        android:id="@+id/tv_NCNNMTCNN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_blacface"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/black"
+        android:text="NCNNMTCNN"
+        android:textSize="40px"
+        android:layout_marginLeft="10px"
+        />
+
+    <TextView
+        android:id="@+id/tv_facenet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_NCNNMTCNN"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/black"
+        android:text="FaceNet"
+        android:textSize="40px"
+        android:background="#0000ff"
+        android:layout_marginTop="40px"
+        />
+
+    <TextView
+        android:id="@+id/tv_facenetLite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_NCNNMTCNN"
+        app:layout_constraintLeft_toRightOf="@id/tv_facenet"
+        android:textColor="@color/black"
+        android:text="FaceNetLite"
+        android:textSize="40px"
+        android:layout_marginLeft="10px"
+        android:layout_marginTop="40px"
         />
 
     <ImageView
         android:id="@+id/iv_take"
         android:layout_width="192px"
         android:layout_height="256px"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <TextView
         android:id="@+id/tv_faceCount"

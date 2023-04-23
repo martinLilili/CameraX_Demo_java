@@ -2,8 +2,8 @@ package com.awo.mycameraxstudy.facenet;
 
 public class FaceFeature {
     public static final int DIMS=512;
-    private float fea[];
-    FaceFeature(){
+    public float fea[];
+    public FaceFeature(){
         fea=new float[DIMS];
     }
     public float[] getFeature(){

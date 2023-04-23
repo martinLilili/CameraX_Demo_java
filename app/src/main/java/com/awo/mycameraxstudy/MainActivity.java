@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import com.awo.mycameraxstudy.BlazeFace.BlazeFace;
 import com.awo.mycameraxstudy.facenet.FaceFeature;
+import com.awo.mycameraxstudy.facenet.FaceNetLite;
 import com.awo.mycameraxstudy.facenet.Facenet;
 import com.awo.mycameraxstudy.mtcnn.Box;
 import com.awo.mycameraxstudy.mtcnn.MTCNN;
@@ -48,11 +49,23 @@ import com.awo.mycameraxstudy.mtcnn.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
+
+    enum DetectModule {
+        BLAZEFAZELITE,
+        MTCNN
+    }
+
+    enum RecognizeModule {
+        FACENET,
+        FACENETLITE
+    }
+
 
     private int REQUEST_CODE_PERMISSIONS = 10; //arbitrary number, can be changed accordingly
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA","android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -70,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     public MTCNN mtcnn;
 
     public Facenet facenet;
+    public FaceNetLite faceNetLite;
 
     TextView tvFaceCount;
     TextView tvScore;
@@ -82,6 +96,14 @@ public class MainActivity extends AppCompatActivity {
     boolean isDetecting = false;
 
     BlazeFace blazeFace;
+
+    DetectModule detectModule = DetectModule.BLAZEFAZELITE;
+    RecognizeModule recognizeModule = RecognizeModule.FACENET;
+
+    TextView tvBlaceFace;
+    TextView tvMTCNN;
+    TextView tvFaceNet;
+    TextView tvFaceNetLite;
 
 
     @Override
@@ -99,14 +121,55 @@ public class MainActivity extends AppCompatActivity {
         tvFeatureCost = findViewById(R.id.tv_featureCost);
         tvCompareCost = findViewById(R.id.tv_compareCost);
         boxView = findViewById(R.id.box);
+        tvBlaceFace = findViewById(R.id.tv_blacface);
+        tvMTCNN = findViewById(R.id.tv_MTCNN);
+        tvFaceNet = findViewById(R.id.tv_facenet);
+        tvFaceNetLite = findViewById(R.id.tv_facenetLite);
 
         facenet=new Facenet(getAssets());
         mtcnn = new MTCNN(getAssets());
         blazeFace = BlazeFace.create(getAssets());
+        faceNetLite = FaceNetLite.create(getAssets());
         takeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 take = true;
+            }
+        });
+
+        tvBlaceFace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                detectModule = DetectModule.BLAZEFAZELITE;
+                tvBlaceFace.setBackgroundColor(0xff0000ff);
+                tvMTCNN.setBackgroundColor(0xffffffff);
+            }
+        });
+
+        tvMTCNN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                detectModule = DetectModule.MTCNN;
+                tvBlaceFace.setBackgroundColor(0xffffffff);
+                tvMTCNN.setBackgroundColor(0xff0000ff);
+            }
+        });
+
+        tvFaceNet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recognizeModule = RecognizeModule.FACENET;
+                tvFaceNet.setBackgroundColor(0xff0000ff);
+                tvFaceNetLite.setBackgroundColor(0xffffffff);
+            }
+        });
+
+        tvFaceNetLite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recognizeModule = RecognizeModule.FACENETLITE;
+                tvFaceNet.setBackgroundColor(0xffffffff);
+                tvFaceNetLite.setBackgroundColor(0xff0000ff);
             }
         });
 
@@ -263,14 +326,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         isDetecting = true;
                         long startTime = System.currentTimeMillis();
-//                        Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
-//                        if (boxes.size() == 0) {
-//                            isDetecting = false;
-//                            return;
-//                        }
-//                        List<Rect> rectList = boxToRect(boxes);
-                        Log.d("MainActivity", "start detect");
-                        List<Rect> rectList = rectfToRect(blazeFace.detect(bitmap));
+                        List<Rect> rectList = detectFaces(bitmap);
                         if (rectList == null || rectList.size() == 0) {
                             isDetecting = false;
                             Log.d("MainActivity", "detect 0");
@@ -330,8 +386,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private List<Rect> detectFaces (Bitmap bitmap) {
+        if (detectModule == DetectModule.BLAZEFAZELITE) {
+            List<Rect> rectList = rectfToRect(blazeFace.detect(bitmap));
+            return rectList;
+        } else {
+            Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
+            List<Rect> rectList = boxToRect(boxes);
+            return rectList;
+        }
+    }
+
     private List<Rect> boxToRect (Vector<Box> boxes) {
         List<Rect> rects = null;
+        if (boxes == null) {
+            return rects;
+        }
         for (Box box : boxes) {
             if (rects == null) {
                 rects = new ArrayList<>();
@@ -411,8 +481,7 @@ public class MainActivity extends AppCompatActivity {
     public List<FaceFeature> getFeatures(Bitmap bitmap, List<Rect> rects) {
         List<Rect> rectList = rects;
         if (rectList == null) {
-            Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
-            rectList = boxToRect(boxes);
+            rectList = detectFaces(bitmap);
         }
         if (rectList == null || rectList.size() == 0) {
             return null;
@@ -422,14 +491,28 @@ public class MainActivity extends AppCompatActivity {
 
         for (Rect rect : rectList) {
             //MTCNN检测到的人脸框，再上下左右扩展margin个像素点，再放入facenet中。
-            int margin=20; //20这个值是facenet中设置的。自己应该可以调整。
-            Utils.rectExtend(bitmap,rect,margin);
-            Bitmap face=Utils.crop(bitmap, rect);
-            FaceFeature ff = facenet.recognizeImage(face);
-            if (faceFeatures == null) {
-                faceFeatures = new ArrayList<>();
+            if (recognizeModule == RecognizeModule.FACENET) {
+                int margin=20; //20这个值是facenet中设置的。自己应该可以调整。
+                Utils.rectExtend(bitmap,rect,margin);
+                Bitmap face=Utils.crop(bitmap, rect);
+                FaceFeature ff = facenet.recognizeImage(face);
+                if (faceFeatures == null) {
+                    faceFeatures = new ArrayList<>();
+                }
+                faceFeatures.add(ff);
+            } else {
+                FloatBuffer floatBuffer = faceNetLite.getEmbeddings(bitmap, rect);
+                float fea[] = new float[512];
+                for (int i = 0; i < 512; i ++) {
+                    fea[i] = floatBuffer.get(i);
+                }
+                FaceFeature ff = new FaceFeature();
+                ff.fea = fea;
+                if (faceFeatures == null) {
+                    faceFeatures = new ArrayList<>();
+                }
+                faceFeatures.add(ff);
             }
-            faceFeatures.add(ff);
         }
         return  faceFeatures;
     }
