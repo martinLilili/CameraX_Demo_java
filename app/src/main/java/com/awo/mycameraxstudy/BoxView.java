@@ -22,6 +22,8 @@ public class BoxView extends View {
 
     Vector<Box> drawBoxs;
 
+    List<Rect> drawRects;
+
     public BoxView(Context context) {
         super(context);
     }
@@ -55,6 +57,17 @@ public class BoxView extends View {
             }
         }
 
+        if (drawRects != null) {
+            for (Rect rect : drawRects) {
+                Paint paint = new Paint();
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setAntiAlias(true);
+                paint.setColor(Color.GREEN);
+                paint.setStrokeWidth(10);
+                canvas.drawRect(scaleRect(rect, 480, 640), paint);
+            }
+        }
+
     }
 
     public void setDrawRect(Rect rect) {
@@ -64,6 +77,11 @@ public class BoxView extends View {
 
     public void setBox(Vector<Box> boxes) {
         drawBoxs = boxes;
+        invalidate();
+    }
+
+    public void setRects(List<Rect> rects) {
+        drawRects = rects;
         invalidate();
     }
 

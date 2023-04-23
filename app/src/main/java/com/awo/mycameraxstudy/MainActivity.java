@@ -22,6 +22,7 @@ import android.graphics.ImageFormat;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.media.Image;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.awo.mycameraxstudy.BlazeFace.BlazeFace;
 import com.awo.mycameraxstudy.facenet.FaceFeature;
 import com.awo.mycameraxstudy.facenet.Facenet;
 import com.awo.mycameraxstudy.mtcnn.Box;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
     boolean isDetecting = false;
 
+    BlazeFace blazeFace;
 
 
     @Override
@@ -99,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         facenet=new Facenet(getAssets());
         mtcnn = new MTCNN(getAssets());
+        blazeFace = BlazeFace.create(getAssets());
         takeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -250,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 if (isDetecting) {
+                    Log.d("MainActivity", "isDetecting");
                     return;
                 }
                 isDetecting = true;
@@ -258,11 +263,23 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         isDetecting = true;
                         long startTime = System.currentTimeMillis();
-                        Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
+//                        Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
+//                        if (boxes.size() == 0) {
+//                            isDetecting = false;
+//                            return;
+//                        }
+//                        List<Rect> rectList = boxToRect(boxes);
+                        Log.d("MainActivity", "start detect");
+                        List<Rect> rectList = rectfToRect(blazeFace.detect(bitmap));
+                        if (rectList == null || rectList.size() == 0) {
+                            isDetecting = false;
+                            Log.d("MainActivity", "detect 0");
+                            return;
+                        }
                         long detectCost = System.currentTimeMillis() - startTime;
-                        if (takeFeature != null && boxes.size() > 0) {
+                        if (takeFeature != null && rectList.size() > 0) {
                             startTime = System.currentTimeMillis();
-                            List<FaceFeature> features2 = getFeatures(bitmap, boxes);
+                            List<FaceFeature> features2 = getFeatures(bitmap, rectList);
                             long featureCost = System.currentTimeMillis() - startTime;
                             if (features2 != null) {
                                 startTime = System.currentTimeMillis();
@@ -274,8 +291,8 @@ public class MainActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        boxView.setBox(boxes);
-                                        tvFaceCount.setText("人脸：" + boxes.size());
+                                        boxView.setRects(rectList);
+                                        tvFaceCount.setText("人脸：" + rectList.size());
                                         tvScore.setText("scroe = "+ score);
                                         tvDetectCost.setText("检测人脸耗时：" + detectCost);
                                         tvFeatureCost.setText("获取feature耗时：" + featureCost);
@@ -288,15 +305,15 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } else {
                             if (take) {
-                                List<FaceFeature> features = getFeatures(bitmap, boxes);
+                                List<FaceFeature> features = getFeatures(bitmap, rectList);
                                 if (features != null);
                                 takeFeature = features.get(0);
                             }
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    boxView.setBox(boxes);
-                                    tvFaceCount.setText("人脸：" + boxes.size());
+                                    boxView.setRects(rectList);
+                                    tvFaceCount.setText("人脸：" + rectList.size());
                                     tvDetectCost.setText("检测人脸耗时：" + detectCost);
                                     if (take) {
                                         takeBitmap = bitmap;
@@ -311,6 +328,29 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }
+    }
+
+    private List<Rect> boxToRect (Vector<Box> boxes) {
+        List<Rect> rects = null;
+        for (Box box : boxes) {
+            if (rects == null) {
+                rects = new ArrayList<>();
+            }
+            rects.add(box.transform2Rect());
+        }
+        return rects;
+    }
+
+    private List<Rect> rectfToRect (List<RectF> rectFS) {
+        List<Rect> rects = null;
+        for (RectF rectF : rectFS) {
+            if (rects == null) {
+                rects = new ArrayList<>();
+            }
+            Rect rect = new Rect((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom);
+            rects.add(rect);
+        }
+        return rects;
     }
 
     private Bitmap toBitmap(Image image) {
@@ -368,24 +408,22 @@ public class MainActivity extends AppCompatActivity {
         return yuv;
     }
 
-    public List<FaceFeature> getFeatures(Bitmap bitmap, Vector<Box> bs) {
-        Vector<Box> boxes = bs;
-        if (boxes == null) {
-            boxes = mtcnn.detectFaces(bitmap,40);
+    public List<FaceFeature> getFeatures(Bitmap bitmap, List<Rect> rects) {
+        List<Rect> rectList = rects;
+        if (rectList == null) {
+            Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
+            rectList = boxToRect(boxes);
         }
-        if (boxes == null || boxes.size() == 0) {
+        if (rectList == null || rectList.size() == 0) {
             return null;
         }
 
         List<FaceFeature> faceFeatures = null;
 
-        for (Box box : boxes) {
-//            Utils.drawBox(bitmap, box,1+bitmap.getWidth()/500);
-            Rect rect = box.transform2Rect();
+        for (Rect rect : rectList) {
             //MTCNN检测到的人脸框，再上下左右扩展margin个像素点，再放入facenet中。
             int margin=20; //20这个值是facenet中设置的。自己应该可以调整。
             Utils.rectExtend(bitmap,rect,margin);
-//            Utils.drawRect(bitmap, rect,1+bitmap.getWidth()/100 );
             Bitmap face=Utils.crop(bitmap, rect);
             FaceFeature ff = facenet.recognizeImage(face);
             if (faceFeatures == null) {
