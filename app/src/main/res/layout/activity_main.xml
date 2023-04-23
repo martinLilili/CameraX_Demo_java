@@ -43,10 +43,47 @@
         app:layout_constraintRight_toRightOf="parent" />
 
     <TextView
-        android:id="@+id/tv_result"
+        android:id="@+id/tv_faceCount"
         android:layout_width="300px"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/black"
+        android:textSize="40px"
+        />
+
+    <TextView
+        android:id="@+id/tv_score"
+        android:layout_width="300px"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_faceCount"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/black"
+        android:textSize="40px"
+        />
+    <TextView
+        android:id="@+id/tv_detectCost"
+        android:layout_width="300px"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_score"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/black"
+        android:textSize="40px"
+        />
+    <TextView
+        android:id="@+id/tv_featureCost"
+        android:layout_width="300px"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_detectCost"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/black"
+        android:textSize="40px"
+        />
+    <TextView
+        android:id="@+id/tv_compareCost"
+        android:layout_width="300px"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_featureCost"
         app:layout_constraintRight_toRightOf="parent"
         android:textColor="@color/black"
         android:textSize="40px"

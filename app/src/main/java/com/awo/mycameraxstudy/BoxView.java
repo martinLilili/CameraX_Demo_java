@@ -9,13 +9,18 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import com.awo.mycameraxstudy.mtcnn.Box;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class BoxView extends View {
 
 
     Rect drawRect = null;
+
+    Vector<Box> drawBoxs;
 
     public BoxView(Context context) {
         super(context);
@@ -39,10 +44,42 @@ public class BoxView extends View {
             canvas.drawRect(drawRect, paint);
         }
 
+        if (drawBoxs != null) {
+            for (Box box : drawBoxs) {
+                Paint paint = new Paint();
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setAntiAlias(true);
+                paint.setColor(Color.GREEN);
+                paint.setStrokeWidth(10);
+                canvas.drawRect(scaleRect(box.transform2Rect(), 480, 640), paint);
+            }
+        }
+
     }
 
     public void setDrawRect(Rect rect) {
         drawRect = rect;
         invalidate();
+    }
+
+    public void setBox(Vector<Box> boxes) {
+        drawBoxs = boxes;
+        invalidate();
+    }
+
+    private Rect scaleRect (Rect rect, int width, int height) {
+        Log.d("MAIN", "image size " + width + " " + height);
+        Log.d("MAIN", "boxview size " + getWidth() + " " + getHeight());
+        float scale = (float)getHeight() /  (float)height;
+        float showWidth = width * scale;
+        float startx = (getWidth() - showWidth)/2;
+
+        Rect newRect = new Rect();
+        newRect.top = (int) (scale * rect.top);
+        newRect.left = (int) (startx + (int) (scale * rect.left));
+        newRect.bottom = (int) (scale * rect.bottom);
+        newRect.right = (int) ((int) (scale * rect.right) + startx);
+        return newRect;
+
     }
 }

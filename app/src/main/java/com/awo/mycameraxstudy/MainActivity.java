@@ -38,12 +38,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.awo.mycameraxstudy.facenet.FaceFeature;
+import com.awo.mycameraxstudy.facenet.Facenet;
 import com.awo.mycameraxstudy.mtcnn.Box;
 import com.awo.mycameraxstudy.mtcnn.MTCNN;
 import com.awo.mycameraxstudy.mtcnn.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,12 +63,23 @@ public class MainActivity extends AppCompatActivity {
     boolean take = false;
 
     Bitmap takeBitmap = null;
+    FaceFeature takeFeature = null;
 
     public MTCNN mtcnn;
 
-    TextView tvResult;
+    public Facenet facenet;
+
+    TextView tvFaceCount;
+    TextView tvScore;
+    TextView tvDetectCost;
+    TextView tvFeatureCost;
+    TextView tvCompareCost;
 
     BoxView boxView;
+
+    boolean isDetecting = false;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +90,14 @@ public class MainActivity extends AppCompatActivity {
         ttv = findViewById(R.id.ttv_camera_preview);
         takeBtn = findViewById(R.id.btn_take);
         ivTake = findViewById(R.id.iv_take);
-        tvResult = findViewById(R.id.tv_result);
+        tvFaceCount = findViewById(R.id.tv_faceCount);
+        tvScore = findViewById(R.id.tv_score);
+        tvDetectCost = findViewById(R.id.tv_detectCost);
+        tvFeatureCost = findViewById(R.id.tv_featureCost);
+        tvCompareCost = findViewById(R.id.tv_compareCost);
         boxView = findViewById(R.id.box);
 
+        facenet=new Facenet(getAssets());
         mtcnn = new MTCNN(getAssets());
         takeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -219,46 +239,78 @@ public class MainActivity extends AppCompatActivity {
             // 在这里对每一帧画面进行处理
             final Image img = image.getImage();
             if (img != null) {
-                Log.d("MainActivity", "Image Time Stamp is: " + img.getTimestamp());
+                long startTime = System.currentTimeMillis();
                 Bitmap bitmap = toBitmap(img);
-                Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
-
+                Log.d("MainActivity", "Image progress caust: " + (System.currentTimeMillis() - startTime));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
-                        for (int i=0;i<boxes.size();i++) {
-                            boxView.setDrawRect(scaleRect(boxes.get(i).transform2Rect(), bitmap));
-                        }
-
                         ttv.setImageBitmap(bitmap);
-                        if (take) {
-                            takeBitmap = bitmap;
-                            ivTake.setImageBitmap(takeBitmap);
-                            take = false;
-                        }
-                        tvResult.setText("人脸：" + boxes.size());
                     }
                 });
 
+                if (isDetecting) {
+                    return;
+                }
+                isDetecting = true;
+                MuliTaskThread.postToMultiTaskThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        isDetecting = true;
+                        long startTime = System.currentTimeMillis();
+                        Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
+                        long detectCost = System.currentTimeMillis() - startTime;
+                        if (takeFeature != null && boxes.size() > 0) {
+                            startTime = System.currentTimeMillis();
+                            List<FaceFeature> features2 = getFeatures(bitmap, boxes);
+                            long featureCost = System.currentTimeMillis() - startTime;
+                            if (features2 != null) {
+                                startTime = System.currentTimeMillis();
+                                double score = takeFeature.compare(features2.get(0));
+                                for (int i = 0; i < 200; i++) {
+                                    takeFeature.compare(features2.get(0));
+                                }
+                                long compareCost = System.currentTimeMillis() - startTime;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        boxView.setBox(boxes);
+                                        tvFaceCount.setText("人脸：" + boxes.size());
+                                        tvScore.setText("scroe = "+ score);
+                                        tvDetectCost.setText("检测人脸耗时：" + detectCost);
+                                        tvFeatureCost.setText("获取feature耗时：" + featureCost);
+                                        tvCompareCost.setText("比较耗时："+ compareCost);
+                                        isDetecting = false;
+                                    }
+                                });
+                            } else {
+                                isDetecting = false;
+                            }
+                        } else {
+                            if (take) {
+                                List<FaceFeature> features = getFeatures(bitmap, boxes);
+                                if (features != null);
+                                takeFeature = features.get(0);
+                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    boxView.setBox(boxes);
+                                    tvFaceCount.setText("人脸：" + boxes.size());
+                                    tvDetectCost.setText("检测人脸耗时：" + detectCost);
+                                    if (take) {
+                                        takeBitmap = bitmap;
+                                        ivTake.setImageBitmap(takeBitmap);
+                                        take = false;
+                                    }
+                                    isDetecting = false;
+                                }
+                            });
+                        }
+                    }
+                });
             }
         }
-    }
-
-    private Rect scaleRect (Rect rect, Bitmap bitmap) {
-        Log.d("MAIN", "image size " + bitmap.getWidth() + " " + bitmap.getHeight());
-        Log.d("MAIN", "boxview size " + boxView.getWidth() + " " + boxView.getHeight());
-        float scale = (float)boxView.getHeight() /  (float)bitmap.getHeight();
-        float showWidth = bitmap.getWidth() * scale;
-        float startx = (boxView.getWidth() - showWidth)/2;
-
-        Rect newRect = new Rect();
-        newRect.top = (int) (scale * rect.top);
-        newRect.left = (int) (startx + (int) (scale * rect.left));
-        newRect.bottom = (int) (scale * rect.bottom);
-        newRect.right = (int) ((int) (scale * rect.right) + startx);
-        return newRect;
-
     }
 
     private Bitmap toBitmap(Image image) {
@@ -277,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
         vBuffer.get(nv21, ySize, vSize);
         uBuffer.get(nv21, ySize + vSize, uSize);
 
+//        旋转90度
         byte[] rotatenv21 = rotateYUV420Degree90(nv21, image.getWidth(), image.getHeight());
 
         YuvImage yuvImage = new YuvImage(rotatenv21, ImageFormat.NV21, image.getHeight(), image.getWidth(), null);
@@ -313,6 +366,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return yuv;
+    }
+
+    public List<FaceFeature> getFeatures(Bitmap bitmap, Vector<Box> bs) {
+        Vector<Box> boxes = bs;
+        if (boxes == null) {
+            boxes = mtcnn.detectFaces(bitmap,40);
+        }
+        if (boxes == null || boxes.size() == 0) {
+            return null;
+        }
+
+        List<FaceFeature> faceFeatures = null;
+
+        for (Box box : boxes) {
+//            Utils.drawBox(bitmap, box,1+bitmap.getWidth()/500);
+            Rect rect = box.transform2Rect();
+            //MTCNN检测到的人脸框，再上下左右扩展margin个像素点，再放入facenet中。
+            int margin=20; //20这个值是facenet中设置的。自己应该可以调整。
+            Utils.rectExtend(bitmap,rect,margin);
+//            Utils.drawRect(bitmap, rect,1+bitmap.getWidth()/100 );
+            Bitmap face=Utils.crop(bitmap, rect);
+            FaceFeature ff = facenet.recognizeImage(face);
+            if (faceFeatures == null) {
+                faceFeatures = new ArrayList<>();
+            }
+            faceFeatures.add(ff);
+        }
+        return  faceFeatures;
     }
 
 }
