@@ -67,6 +67,7 @@
         android:text="NCNNMTCNN"
         android:textSize="40px"
         android:layout_marginLeft="10px"
+        android:visibility="invisible"
         />
 
     <TextView

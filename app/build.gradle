@@ -14,6 +14,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+//        ndk {
+//            moduleName "ncnn"
+//            abiFilters "armeabi-v7a"
+//        }
+
     }
 
     buildTypes {
@@ -26,6 +32,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+//    externalNativeBuild {
+//        cmake {
+//            version "3.10.2"
+//            path file('src/main/jni/CMakeLists.txt')
+//        }
+//    }
+//    ndkVersion '25.2.9519653'
 }
 
 dependencies {

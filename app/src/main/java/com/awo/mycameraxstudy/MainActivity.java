@@ -332,6 +332,12 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("MainActivity", "detect 0");
                             return;
                         }
+
+                        if (take) {
+                            List<FaceFeature> features = getFeatures(bitmap, rectList);
+                            if (features != null);
+                            takeFeature = features.get(0);
+                        }
                         long detectCost = System.currentTimeMillis() - startTime;
                         if (takeFeature != null && rectList.size() > 0) {
                             startTime = System.currentTimeMillis();
@@ -353,6 +359,11 @@ public class MainActivity extends AppCompatActivity {
                                         tvDetectCost.setText("检测人脸耗时：" + detectCost);
                                         tvFeatureCost.setText("获取feature耗时：" + featureCost);
                                         tvCompareCost.setText("比较耗时："+ compareCost);
+                                        if (take) {
+                                            takeBitmap = bitmap;
+                                            ivTake.setImageBitmap(takeBitmap);
+                                            take = false;
+                                        }
                                         isDetecting = false;
                                     }
                                 });
@@ -360,11 +371,6 @@ public class MainActivity extends AppCompatActivity {
                                 isDetecting = false;
                             }
                         } else {
-                            if (take) {
-                                List<FaceFeature> features = getFeatures(bitmap, rectList);
-                                if (features != null);
-                                takeFeature = features.get(0);
-                            }
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
