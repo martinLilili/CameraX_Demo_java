@@ -1,0 +1,55 @@
+{
+  "buildFiles": [
+    "/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Android.mk",
+    "/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Application.mk"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/yueli/Library/Android/sdk/ndk/25.2.9519653/ndk-build",
+      "NDK_PROJECT_PATH\u003dnull",
+      "APP_BUILD_SCRIPT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Android.mk",
+      "NDK_APPLICATION_MK\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Application.mk",
+      "APP_ABI\u003darm64-v8a",
+      "NDK_ALL_ABIS\u003darm64-v8a",
+      "NDK_DEBUG\u003d1",
+      "APP_PLATFORM\u003dandroid-24",
+      "NDK_OUT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/obj",
+      "NDK_LIBS_OUT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/lib",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/yueli/Library/Android/sdk/ndk/25.2.9519653/ndk-build",
+    "NDK_PROJECT_PATH\u003dnull",
+    "APP_BUILD_SCRIPT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Android.mk",
+    "NDK_APPLICATION_MK\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Application.mk",
+    "APP_ABI\u003darm64-v8a",
+    "NDK_ALL_ABIS\u003darm64-v8a",
+    "NDK_DEBUG\u003d1",
+    "APP_PLATFORM\u003dandroid-24",
+    "NDK_OUT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/obj",
+    "NDK_LIBS_OUT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/lib",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "combined_jni-debug-arm64-v8a": {
+      "artifactName": "combined_jni",
+      "buildCommandComponents": [
+        "/Users/yueli/Library/Android/sdk/ndk/25.2.9519653/ndk-build",
+        "NDK_PROJECT_PATH\u003dnull",
+        "APP_BUILD_SCRIPT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Android.mk",
+        "NDK_APPLICATION_MK\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/jni/Application.mk",
+        "APP_ABI\u003darm64-v8a",
+        "NDK_ALL_ABIS\u003darm64-v8a",
+        "NDK_DEBUG\u003d1",
+        "APP_PLATFORM\u003dandroid-24",
+        "NDK_OUT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/obj",
+        "NDK_LIBS_OUT\u003d/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/lib",
+        "/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/obj/local/arm64-v8a/libcombined_jni.so"
+      ],
+      "abi": "arm64-v8a",
+      "output": "/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/obj/local/arm64-v8a/libcombined_jni.so",
+      "runtimeFiles": []
+    }
+  }
+}

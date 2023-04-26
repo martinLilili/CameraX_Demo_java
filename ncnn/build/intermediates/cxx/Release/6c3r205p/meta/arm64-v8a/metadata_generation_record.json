@@ -1,0 +1,184 @@
+[
+  {
+    "level_": 0,
+    "message_": "Start JSON generation. Platform version: 24 min SDK version: arm64-v8a",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1256338769
+  },
+  {
+    "level_": 0,
+    "message_": "rebuilding JSON /Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/.cxx/Release/6c3r205p/arm64-v8a/android_gradle_build.json due to:",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1267980019
+  },
+  {
+    "level_": 0,
+    "message_": "- expected json /Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/.cxx/Release/6c3r205p/arm64-v8a/android_gradle_build.json file is not present, will remove stale json folder",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 87318485
+  },
+  {
+    "level_": 0,
+    "message_": "- missing previous command file /Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/.cxx/Release/6c3r205p/arm64-v8a/metadata_generation_command.txt, will remove stale json folder",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -22249997
+  },
+  {
+    "level_": 0,
+    "message_": "- command changed from previous, will remove stale json folder",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -540209124
+  },
+  {
+    "level_": 0,
+    "message_": "created folder \u0027/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/.cxx/Release/6c3r205p/arm64-v8a\u0027",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -1428518534
+  },
+  {
+    "level_": 0,
+    "message_": "executing ndkBuild Executable : /Users/yueli/Library/Android/sdk/ndk/25.2.9519653/ndk-build\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk\nNDK_APPLICATION_MK\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Application.mk\nAPP_ABI\u003darm64-v8a\nNDK_ALL_ABIS\u003darm64-v8a\nNDK_DEBUG\u003d0\nAPP_PLATFORM\u003dandroid-24\nNDK_OUT\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/intermediates/cxx/Release/6c3r205p/obj\nNDK_LIBS_OUT\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/intermediates/cxx/Release/6c3r205p/lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1847396032
+  },
+  {
+    "level_": 0,
+    "message_": "Executable : /Users/yueli/Library/Android/sdk/ndk/25.2.9519653/ndk-build\narguments : \nNDK_PROJECT_PATH\u003dnull\nAPP_BUILD_SCRIPT\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk\nNDK_APPLICATION_MK\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Application.mk\nAPP_ABI\u003darm64-v8a\nNDK_ALL_ABIS\u003darm64-v8a\nNDK_DEBUG\u003d0\nAPP_PLATFORM\u003dandroid-24\nNDK_OUT\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/intermediates/cxx/Release/6c3r205p/obj\nNDK_LIBS_OUT\u003d/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/intermediates/cxx/Release/6c3r205p/lib\nAPP_SHORT_COMMANDS\u003dfalse\nLOCAL_SHORT_COMMANDS\u003dfalse\n-B\n-n\njvmArgs : \n\n",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 615917331
+  },
+  {
+    "level_": 0,
+    "message_": "parse and convert ndk-build output to build configuration JSON",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -2097692437
+  },
+  {
+    "level_": 0,
+    "message_": "found application make file /Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Application.mk",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -358806528
+  },
+  {
+    "level_": 0,
+    "message_": "done executing ndkBuild",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -232845871
+  },
+  {
+    "level_": 0,
+    "message_": "write command file /Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/.cxx/Release/6c3r205p/arm64-v8a/metadata_generation_command.txt",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": -622031129
+  },
+  {
+    "level_": 0,
+    "message_": "JSON generation completed without problems",
+    "file_": "/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk",
+    "tag_": "release|arm64-v8a",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {},
+      "fieldsDescending": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 1085517709
+  }
+]

@@ -1,0 +1,1 @@
+/Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/build/intermediates/cxx/Debug/2i21445f/obj/local/arm64-v8a

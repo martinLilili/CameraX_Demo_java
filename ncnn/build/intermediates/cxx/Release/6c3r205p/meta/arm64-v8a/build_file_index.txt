@@ -1,0 +1,2 @@
+/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Android.mk
+/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/src/main/jni/Application.mk

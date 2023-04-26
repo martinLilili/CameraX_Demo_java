@@ -1,0 +1,35 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:4:1-15:12
+INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:4:1-15:12
+INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:4:1-15:12
+	package
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:5:7-35
+		INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml
+		INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml
+	android:versionName
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:7:7-32
+	xmlns:android
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:4:11-69
+	android:versionCode
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:6:7-30
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:9:5-79
+	android:name
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:9:22-77
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:10:5-80
+	android:name
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:10:22-78
+application
+ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:12:5-14:19
+	android:label
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml:12:18-50
+uses-sdk
+INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml
+INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml
+		ADDED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml
+		INJECTED from /Users/yueli/Develop/FaceReognizer/CameraX_Demo_java/ncnn/src/main/AndroidManifest.xml

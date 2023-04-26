@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+id buttonAtOnce
+id buttonDetect
+id buttonExtract
+id buttonImage
+id imageView
+id infoResult
+id prevImageView
+layout main
+string app_name

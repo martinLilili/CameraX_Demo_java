@@ -13,21 +13,28 @@ import androidx.camera.core.ImageInfo;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.YuvImage;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
@@ -46,8 +53,13 @@ import com.awo.mycameraxstudy.facenet.Facenet;
 import com.awo.mycameraxstudy.mtcnn.Box;
 import com.awo.mycameraxstudy.mtcnn.MTCNN;
 import com.awo.mycameraxstudy.mtcnn.Utils;
+import com.revivers.mtcnn.ARCFACE;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -58,12 +70,14 @@ public class MainActivity extends AppCompatActivity {
 
     enum DetectModule {
         BLAZEFAZELITE,
-        MTCNN
+        MTCNN,
+        NCNNMTCNN
     }
 
     enum RecognizeModule {
         FACENET,
-        FACENETLITE
+        FACENETLITE,
+        ARCFACE
     }
 
 
@@ -79,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
 
     Bitmap takeBitmap = null;
     FaceFeature takeFeature = null;
+
+    private float[] takeArcFeature = null;
 
     public MTCNN mtcnn;
 
@@ -97,20 +113,27 @@ public class MainActivity extends AppCompatActivity {
 
     BlazeFace blazeFace;
 
-    DetectModule detectModule = DetectModule.BLAZEFAZELITE;
-    RecognizeModule recognizeModule = RecognizeModule.FACENET;
+    DetectModule detectModule = DetectModule.NCNNMTCNN;
+    RecognizeModule recognizeModule = RecognizeModule.ARCFACE;
 
     TextView tvBlaceFace;
     TextView tvMTCNN;
+    TextView tvNCNNMTCNN;
     TextView tvFaceNet;
     TextView tvFaceNetLite;
 
+    TextView tvArcFace;
+
+    private com.revivers.mtcnn.MTCNN ncnnMtcnn = new com.revivers.mtcnn.MTCNN();
+
+    private ARCFACE arcface = new ARCFACE();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkSelfPermission();
         // 第一步：设置预览组件的OnLayoutChangeListener（当预览组件的尺寸发生改变时的回调）
         ttv = findViewById(R.id.ttv_camera_preview);
         takeBtn = findViewById(R.id.btn_take);
@@ -123,13 +146,45 @@ public class MainActivity extends AppCompatActivity {
         boxView = findViewById(R.id.box);
         tvBlaceFace = findViewById(R.id.tv_blacface);
         tvMTCNN = findViewById(R.id.tv_MTCNN);
+        tvNCNNMTCNN = findViewById(R.id.tv_NCNNMTCNN);
         tvFaceNet = findViewById(R.id.tv_facenet);
         tvFaceNetLite = findViewById(R.id.tv_facenetLite);
+        tvArcFace = findViewById(R.id.tv_arcface);
 
         facenet=new Facenet(getAssets());
         mtcnn = new MTCNN(getAssets());
         blazeFace = BlazeFace.create(getAssets());
         faceNetLite = FaceNetLite.create(getAssets());
+
+        try {
+            copyBigDataToSD("det1.bin");
+            copyBigDataToSD("det2.bin");
+            copyBigDataToSD("det3.bin");
+            copyBigDataToSD("det1.param");
+            copyBigDataToSD("det2.param");
+            copyBigDataToSD("det3.param");
+            copyBigDataToSD("mobilefacenet.bin");
+            copyBigDataToSD("mobilefacenet.param");
+            Log.i("Temp tag", "Succeeded to load the weights");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.i("Temp tag", "Failed to load the weights");
+        }
+        //模型初始化
+
+        File sdDir = getExternalFilesDir(null);//获取跟目录
+        String sdPath = sdDir.toString() + "/mtcnn/";
+        Log.i("sdPath",sdPath);
+        ncnnMtcnn.FaceDetectionModelInit(sdPath);
+
+        // Arcface model initialization
+        if (arcface.FeatureExtractionModelInit(sdPath)) {
+            Log.i("Temp tag", "ArcFace model successfully initialized");
+        }
+        else {
+            Log.i("Temp tag", "FAILED TO INITIALIZE THE ARCFACE MODEL!!!!!!!!");
+        }
+
         takeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -143,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 detectModule = DetectModule.BLAZEFAZELITE;
                 tvBlaceFace.setBackgroundColor(0xff0000ff);
                 tvMTCNN.setBackgroundColor(0xffffffff);
+                tvNCNNMTCNN.setBackgroundColor(0xffffffff);
             }
         });
 
@@ -152,6 +208,17 @@ public class MainActivity extends AppCompatActivity {
                 detectModule = DetectModule.MTCNN;
                 tvBlaceFace.setBackgroundColor(0xffffffff);
                 tvMTCNN.setBackgroundColor(0xff0000ff);
+                tvNCNNMTCNN.setBackgroundColor(0xffffffff);
+            }
+        });
+
+        tvNCNNMTCNN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                detectModule = DetectModule.NCNNMTCNN;
+                tvBlaceFace.setBackgroundColor(0xffffffff);
+                tvMTCNN.setBackgroundColor(0xffffffff);
+                tvNCNNMTCNN.setBackgroundColor(0xff0000ff);
             }
         });
 
@@ -161,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
                 recognizeModule = RecognizeModule.FACENET;
                 tvFaceNet.setBackgroundColor(0xff0000ff);
                 tvFaceNetLite.setBackgroundColor(0xffffffff);
+                tvArcFace.setBackgroundColor(0xffffffff);
             }
         });
 
@@ -170,24 +238,72 @@ public class MainActivity extends AppCompatActivity {
                 recognizeModule = RecognizeModule.FACENETLITE;
                 tvFaceNet.setBackgroundColor(0xffffffff);
                 tvFaceNetLite.setBackgroundColor(0xff0000ff);
+                tvArcFace.setBackgroundColor(0xffffffff);
             }
         });
 
-//        ttv.setRotationY(180);//镜像翻转
-//        ttv.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-//            @Override
-//            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-//                // 尺寸变化时确保预览画面的方向始终正确
-//                updateTransform();
-//            }
-//        });
-        /*View的宽、高确定后，将在主线程执行run()方法，此处用来启动相机*/
+        tvArcFace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recognizeModule = RecognizeModule.ARCFACE;
+                tvFaceNet.setBackgroundColor(0xffffffff);
+                tvFaceNetLite.setBackgroundColor(0xffffffff);
+                tvArcFace.setBackgroundColor(0xff0000ff);
+            }
+        });
+
         ttv.post(new Runnable() {
             @Override
             public void run() {
                 startCamera();
             }
         });
+    }
+
+    private void copyBigDataToSD(String strOutFileName) throws IOException {
+        Log.i("main111", "start copy file " + strOutFileName);
+        File sdDir = getExternalFilesDir(null);//获取跟目录
+        File file = new File(sdDir.toString()+"/mtcnn/");
+        if (!file.exists()) {
+            file.mkdir();
+        }
+
+        String tmpFile = sdDir.toString()+"/mtcnn/" + strOutFileName;
+        File f = new File(tmpFile);
+        if (f.exists()) {
+            Log.i("main111", "file exists " + strOutFileName);
+            return;
+        }
+        InputStream myInput;
+        java.io.OutputStream myOutput = new FileOutputStream(sdDir.toString()+"/mtcnn/"+ strOutFileName);
+        myInput = this.getAssets().open(strOutFileName);
+        byte[] buffer = new byte[1024];
+        int length = myInput.read(buffer);
+        while (length > 0) {
+            myOutput.write(buffer, 0, length);
+            length = myInput.read(buffer);
+        }
+        myOutput.flush();
+        myInput.close();
+        myOutput.close();
+        Log.i("main111", "end copy file " + strOutFileName);
+
+    }
+
+    public void checkSelfPermission() {
+        String temp = ""; //파일 읽기 권한 확인
+        Log.i("main111", "checkSelfPermission 1111");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            temp += Manifest.permission.READ_EXTERNAL_STORAGE + " ";
+            Log.i("main111", "checkSelfPermission 2222");
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            temp += Manifest.permission.WRITE_EXTERNAL_STORAGE + " "; } if (TextUtils.isEmpty(temp) == false) {
+            ActivityCompat.requestPermissions(this, temp.trim().split(" "),1);
+            Log.i("main111", "checkSelfPermission 3333");
+        } else {
+            Log.i("main111", "checkSelfPermission 4444");
+        }
     }
 
     private void startCamera() {
@@ -308,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
             if (img != null) {
                 long startTime = System.currentTimeMillis();
                 Bitmap bitmap = toBitmap(img);
-                Log.d("MainActivity", "Image progress caust: " + (System.currentTimeMillis() - startTime));
+//                Log.d("MainActivity", "Image progress caust: " + (System.currentTimeMillis() - startTime));
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -317,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 if (isDetecting) {
-                    Log.d("MainActivity", "isDetecting");
+//                    Log.d("MainActivity", "isDetecting");
                     return;
                 }
                 isDetecting = true;
@@ -325,40 +441,64 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         isDetecting = true;
-                        long startTime = System.currentTimeMillis();
-                        List<Rect> rectList = detectFaces(bitmap);
-                        if (rectList == null || rectList.size() == 0) {
-                            isDetecting = false;
-                            Log.d("MainActivity", "detect 0");
-                            return;
-                        }
+                        if (recognizeModule == RecognizeModule.ARCFACE) {
+                            recognizeArcFace(bitmap);
+                        } else {
+                            long startTime = System.currentTimeMillis();
+                            List<Rect> rectList = detectFaces(bitmap);
+                            if (rectList == null || rectList.size() == 0) {
+                                isDetecting = false;
+//                            Log.d("MainActivity", "detect 0");
+                                return;
+                            }
 
-                        if (take) {
-                            List<FaceFeature> features = getFeatures(bitmap, rectList);
-                            if (features != null);
-                            takeFeature = features.get(0);
-                        }
-                        long detectCost = System.currentTimeMillis() - startTime;
-                        if (takeFeature != null && rectList.size() > 0) {
-                            startTime = System.currentTimeMillis();
-                            List<FaceFeature> features2 = getFeatures(bitmap, rectList);
-                            long featureCost = System.currentTimeMillis() - startTime;
-                            if (features2 != null) {
+                            if (take) {
+                                List<FaceFeature> features = getFeatures(bitmap, rectList);
+                                if (features != null);
+                                takeFeature = features.get(0);
+                            }
+                            long detectCost = System.currentTimeMillis() - startTime;
+                            if (takeFeature != null && rectList.size() > 0) {
                                 startTime = System.currentTimeMillis();
-                                double score = takeFeature.compare(features2.get(0));
-                                for (int i = 0; i < 200; i++) {
-                                    takeFeature.compare(features2.get(0));
+                                List<FaceFeature> features2 = getFeatures(bitmap, rectList);
+                                long featureCost = System.currentTimeMillis() - startTime;
+                                if (features2 != null) {
+                                    startTime = System.currentTimeMillis();
+                                    double score = 0;
+                                    if (recognizeModule == RecognizeModule.ARCFACE) {
+                                        score = takeFeature.compareArc(features2.get(0));
+                                    } else {
+                                        score = takeFeature.compare(features2.get(0));
+                                    }
+                                    long compareCost = System.currentTimeMillis() - startTime;
+                                    double finalScore = score;
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            boxView.setRects(rectList);
+                                            tvFaceCount.setText("人脸：" + rectList.size());
+                                            tvScore.setText("scroe = " + finalScore);
+                                            tvDetectCost.setText("检测人脸耗时：" + detectCost);
+                                            tvFeatureCost.setText("获取feature耗时：" + featureCost);
+                                            tvCompareCost.setText("比较耗时："+ compareCost);
+                                            if (take) {
+                                                takeBitmap = bitmap;
+                                                ivTake.setImageBitmap(takeBitmap);
+                                                take = false;
+                                            }
+                                            isDetecting = false;
+                                        }
+                                    });
+                                } else {
+                                    isDetecting = false;
                                 }
-                                long compareCost = System.currentTimeMillis() - startTime;
+                            } else {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
                                         boxView.setRects(rectList);
                                         tvFaceCount.setText("人脸：" + rectList.size());
-                                        tvScore.setText("scroe = "+ score);
                                         tvDetectCost.setText("检测人脸耗时：" + detectCost);
-                                        tvFeatureCost.setText("获取feature耗时：" + featureCost);
-                                        tvCompareCost.setText("比较耗时："+ compareCost);
                                         if (take) {
                                             takeBitmap = bitmap;
                                             ivTake.setImageBitmap(takeBitmap);
@@ -367,24 +507,7 @@ public class MainActivity extends AppCompatActivity {
                                         isDetecting = false;
                                     }
                                 });
-                            } else {
-                                isDetecting = false;
                             }
-                        } else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    boxView.setRects(rectList);
-                                    tvFaceCount.setText("人脸：" + rectList.size());
-                                    tvDetectCost.setText("检测人脸耗时：" + detectCost);
-                                    if (take) {
-                                        takeBitmap = bitmap;
-                                        ivTake.setImageBitmap(takeBitmap);
-                                        take = false;
-                                    }
-                                    isDetecting = false;
-                                }
-                            });
                         }
                     }
                 });
@@ -396,11 +519,30 @@ public class MainActivity extends AppCompatActivity {
         if (detectModule == DetectModule.BLAZEFAZELITE) {
             List<Rect> rectList = rectfToRect(blazeFace.detect(bitmap));
             return rectList;
-        } else {
+        }
+        if (detectModule == DetectModule.MTCNN) {
             Vector<Box> boxes = mtcnn.detectFaces(bitmap,40);
             List<Rect> rectList = boxToRect(boxes);
             return rectList;
         }
+        if (detectModule == DetectModule.NCNNMTCNN) {
+            List<Rect> rectList = null;
+            int faceInfo[] = ncnnMtcnn.FaceDetect(getPixelsRGBA(bitmap), bitmap.getWidth(), bitmap.getHeight(), 4);
+            int faceNum = faceInfo[0];
+            for(int i=0;i<faceNum;i++) {
+                if (rectList == null) {
+                    rectList = new ArrayList<>();
+                }
+                int left, top, right, bottom;
+                left = faceInfo[1+14*i];
+                top = faceInfo[2+14*i];
+                right = faceInfo[3+14*i];
+                bottom = faceInfo[4+14*i];
+                rectList.add(new Rect(left, top, right, bottom));
+            }
+            return rectList;
+        }
+        return null;
     }
 
     private List<Rect> boxToRect (Vector<Box> boxes) {
@@ -506,7 +648,7 @@ public class MainActivity extends AppCompatActivity {
                     faceFeatures = new ArrayList<>();
                 }
                 faceFeatures.add(ff);
-            } else {
+            } else if (recognizeModule == RecognizeModule.FACENETLITE) {
                 FloatBuffer floatBuffer = faceNetLite.getEmbeddings(bitmap, rect);
                 float fea[] = new float[512];
                 for (int i = 0; i < 512; i ++) {
@@ -518,9 +660,113 @@ public class MainActivity extends AppCompatActivity {
                     faceFeatures = new ArrayList<>();
                 }
                 faceFeatures.add(ff);
+            } else if (recognizeModule == RecognizeModule.ARCFACE) {
+//                float[] floats = arcface.getFeature(getPixelsRGBA(bitmap), bitmap.getWidth(), bitmap.getHeight(), 4);
+//                FaceFeature ff = new FaceFeature();
+//                ff.arcfacefea = floats;
+//                if (faceFeatures == null) {
+//                    faceFeatures = new ArrayList<>();
+//                }
+//                faceFeatures.add(ff);
             }
         }
         return  faceFeatures;
+    }
+
+    private byte[] getPixelsRGBA(Bitmap image) {
+        // calculate how many bytes our image consists of
+        int bytes = image.getByteCount();
+        ByteBuffer buffer = ByteBuffer.allocate(bytes); // Create a new buffer
+        image.copyPixelsToBuffer(buffer); // Move the byte data to the buffer
+        byte[] temp = buffer.array(); // Get the underlying array containing the
+
+        return temp;
+    }
+
+    private void recognizeArcFace (Bitmap bitmap) {
+        long startTime = System.currentTimeMillis();
+        List<Rect> rectList = null;
+        int faceInfo[] = ncnnMtcnn.FaceDetect(getPixelsRGBA(bitmap), bitmap.getWidth(), bitmap.getHeight(), 4);
+        int faceNum = faceInfo[0];
+        for(int i=0;i<faceNum;i++) {
+            if (rectList == null) {
+                rectList = new ArrayList<>();
+            }
+            int left, top, right, bottom;
+            left = faceInfo[1+14*i];
+            top = faceInfo[2+14*i];
+            right = faceInfo[3+14*i];
+            bottom = faceInfo[4+14*i];
+            rectList.add(new Rect(left, top, right, bottom));
+        }
+        int[] currentFaceInfo = new int[14];
+        if (rectList == null || rectList.size() == 0) {
+            isDetecting = false;
+            return;
+        }
+        for(int i = 0; i < 14; i++) {
+            currentFaceInfo[i] = faceInfo[i+1];
+        }
+
+        if (take) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            byte[] imageData = getPixelsRGBA(bitmap);
+            takeArcFeature = arcface.getFeature(imageData, width, height, 4, currentFaceInfo);
+        }
+        long detectCost = System.currentTimeMillis() - startTime;
+        if (takeArcFeature != null && rectList.size() > 0) {
+            startTime = System.currentTimeMillis();
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            byte[] imageData = getPixelsRGBA(bitmap);
+            float[] features2 = arcface.getFeature(imageData, width, height, 4, currentFaceInfo);
+            long featureCost = System.currentTimeMillis() - startTime;
+            if (features2 != null) {
+                startTime = System.currentTimeMillis();
+                double score = 0;
+                for (int i = 0; i < features2.length; i++)
+                    score += features2[i] * takeArcFeature[i];
+                long compareCost = System.currentTimeMillis() - startTime;
+                double finalScore = score;
+                List<Rect> finalRectList = rectList;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        boxView.setRects(finalRectList);
+                        tvFaceCount.setText("人脸：" + finalRectList.size());
+                        tvScore.setText("scroe = " + finalScore);
+                        tvDetectCost.setText("检测人脸耗时：" + detectCost);
+                        tvFeatureCost.setText("获取feature耗时：" + featureCost);
+                        tvCompareCost.setText("比较耗时："+ compareCost);
+                        if (take) {
+                            takeBitmap = bitmap;
+                            ivTake.setImageBitmap(takeBitmap);
+                            take = false;
+                        }
+                        isDetecting = false;
+                    }
+                });
+            } else {
+                isDetecting = false;
+            }
+        } else {
+            List<Rect> finalRectList1 = rectList;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    boxView.setRects(finalRectList1);
+                    tvFaceCount.setText("人脸：" + finalRectList1.size());
+                    tvDetectCost.setText("检测人脸耗时：" + detectCost);
+                    if (take) {
+                        takeBitmap = bitmap;
+                        ivTake.setImageBitmap(takeBitmap);
+                        take = false;
+                    }
+                    isDetecting = false;
+                }
+            });
+        }
     }
 
 }

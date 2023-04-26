@@ -1,0 +1,1 @@
+/Users/yueli/Develop/FaceReognizer/ncnn-mtcnn-arcface-android/app/build/intermediates/cxx/Debug/5a6zx1ww/obj/local/arm64-v8a
